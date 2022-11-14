@@ -1,4 +1,6 @@
+import 'package:first_flutter_project/main.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -76,11 +78,11 @@ class _Pertemuan1State extends State<Pertemuan1> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextFormField(
-              decoration: new InputDecoration(
+              decoration: InputDecoration(
                 labelText: "Ini Label Masseh",
                 hintText: "Teks yang diinput adalah yes or yes",
                 border: OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(5),
                   )
               ),
             ),
@@ -92,7 +94,7 @@ class _Pertemuan1State extends State<Pertemuan1> {
                 labelText: "Ini Label Lagi Brow",
                 hintText: "Teks yang diinput adalah no or no",
                 border: OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(5),
                 )
               ),
             ),
@@ -101,15 +103,33 @@ class _Pertemuan1State extends State<Pertemuan1> {
             ),
             TextButton(
                 onPressed: () {},
+
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Colors.blueAccent
                 ),
                 child: Text(
                   "Submit me daddy",
-                  style: TextStyle(fontSize: 24)
+                  style: TextStyle(fontSize: 16)
                 ),
-            )
+            ),TextButton(
+                onPressed: () async {
+                  SharedPreferences pref = await SharedPreferences.getInstance();
+                  await pref.setInt("is_login", 0);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Hello World')),
+                  );
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.redAccent
+                ),
+                child: const Text(
+                   "Logout",
+                    style: TextStyle(fontSize: 16)
+                ),
+            ),
           ],
         ),
       ),
