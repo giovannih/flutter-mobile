@@ -1,12 +1,26 @@
+import 'dart:io';
+
+import 'package:first_flutter_project/mahasiswa/mahasiswa_get.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 // void main() {
 //   runApp(const Home());
 // }
+
+
 void main() {
+  HttpOverrides.global = new MyHttpOverrides();
   runApp(new MaterialApp(
       home: Home()
   ));
+}
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
 }
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -38,30 +52,20 @@ class _HomeState extends State<Home> {
                 accountEmail: Text("CRUD Matakuliah")),
             ListTile(
               leading: Icon(Icons.person),
-              title: const Text('Pertemuan 1'),
+              title: const Text('Mahasiswa'),
               onTap: () {
-                // Update the state of the app.
-                // ...
-                //Then Close The drawer
-                Navigator.pop(context);
+                Navigator.push(context,
+                    MaterialPageRoute(
+                        builder: (context)=> GetMahasiswa()));
+                // Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Pertemuan 13'),
-              leading: Icon(Icons.ac_unit_outlined),
+              title: const Text('Add Mahasiswa'),
+              leading: Icon(Icons.person_add),
               onTap: () {
-                // Update the state of the app.
-                // ...
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Punten'),
-              leading: Icon(Icons.add_circle),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-                Navigator.pop(context);
+
+                // Navigator.pop(context);
               },
             ),
           ],
