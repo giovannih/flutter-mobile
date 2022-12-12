@@ -3,17 +3,46 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class Mahasiswa_add extends StatefulWidget {
-  const Mahasiswa_add({Key? key}) : super(key: key);
+class Mahasiswa_update extends StatefulWidget {
 
+  Mahasiswa_update({Key? key , required this.nim}) : super(key: key);
+  final String nim;
+  
   @override
-  State<Mahasiswa_add> createState() => _Mahasiswa_addState();
+  State<Mahasiswa_update> createState() => _Mahasiswa_updateState();
 }
 
-class _Mahasiswa_addState extends State<Mahasiswa_add> {
+class _Mahasiswa_updateState extends State<Mahasiswa_update> {
+  List _get = [];
+
+  Future _getDataMhs() async {
+    try{
+      final response = await http.get(Uri.parse(
+          'https://kpsi.fti.ukdw.ac.id/api/progmob/mhs/72200366'
+      ));
+
+      if(response.statusCode == 200){
+        final data = jsonDecode(response.body);
+
+        setState((){
+          _get.clear();
+          _get = data;
+        });
+      }
+    }catch(e) {
+      print(e);
+    }
+  }
+  @override
+  void initState(){
+    //useEffect()
+    super.initState();
+    _getDataMhs();
+  }
   final _formKey = GlobalKey<FormState>();
   Future<List>? resp;
-
+  
+  TextEditingController idController = new TextEditingController();
   TextEditingController namaController = new TextEditingController();
   TextEditingController nimController = new TextEditingController();
   TextEditingController alamatController = new TextEditingController();
@@ -21,14 +50,15 @@ class _Mahasiswa_addState extends State<Mahasiswa_add> {
   TextEditingController fotoController = new TextEditingController();
   TextEditingController nimProgmobController = new TextEditingController();
 
-  Future<List> sendMhs(String nama,nim,alamat,email,foto,nim_progmob) async {
+  Future<List> updateMhs(String id,nama,nim,alamat,email,foto,nim_progmob) async {
     final http.Response response = await http.post((Uri.parse(
-        'https://kpsi.fti.ukdw.ac.id/api/progmob/mhs/create'
+        'https://kpsi.fti.ukdw.ac.id/api/progmob/mhs/update'
     )),
       headers: <String, String>{
         "Content-Type": 'application/json; charset=UTF-8'
       },
       body: jsonEncode(<String, String>{
+        'id': id,
         'nama': nama,
         'nim': nim,
         'alamat': alamat,
@@ -37,7 +67,7 @@ class _Mahasiswa_addState extends State<Mahasiswa_add> {
         'nim_progmob': nim_progmob
       }),
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
       throw Exception('Failed to load response');
@@ -47,7 +77,7 @@ class _Mahasiswa_addState extends State<Mahasiswa_add> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Insert Mahasiswa"),
+        title: Text("Update Mahasiswa"),
       ),
       body: Form(
         key: _formKey,
@@ -58,10 +88,10 @@ class _Mahasiswa_addState extends State<Mahasiswa_add> {
             TextFormField(
               controller: namaController,
               decoration: InputDecoration(
-                labelText: "nama",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15)
-                )
+                  labelText: "nama",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15)
+                  )
               ),
               maxLength: 50,
               // The validator receives the text that the user has entered.
@@ -161,8 +191,8 @@ class _Mahasiswa_addState extends State<Mahasiswa_add> {
               onPressed: () {
                 // Validate returns true if the form is valid, or false otherwise.
                 if (_formKey.currentState!.validate()) {
-                  resp = sendMhs(namaController.text, nimController.text, alamatController.text, emailController.text,
-                  fotoController.text, nimProgmobController.text);
+                  resp = updateMhs(idController.text,namaController.text, nimController.text, alamatController.text, emailController.text,
+                      fotoController.text, nimProgmobController.text);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Processing Data')),
                   );
